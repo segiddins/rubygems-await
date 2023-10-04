@@ -1,0 +1,29 @@
+on:
+  push:
+    tags: true
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: rubygems/configure-rubygems-credentials@main
+        with:
+          role-to-assume: ""
+      - uses: actions/checkout@v4
+      - name: Set remote URL
+        run: |
+          git config --global user.email "$(git log -1 --pretty=format:'%ae')"
+          git config --global user.name "$(git log -1 --pretty=format:'%an')"
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY"
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2.2"
+          bundler-cache: true
+      - name: Release
+        run: bin/rake release
+      - name: Await
+        run: bin/gem await rubygems-await:$(bin/bundle info rubygems-await --version)
