@@ -59,12 +59,13 @@ module Gem
       end
 
       def execute
+        ui = Gem.ui
+
+        Bundler.ui # initialize
         unless defined?(Bundler::Thor::Shell::Color::UNDERLINE)
           Bundler::Thor::Shell::Color.const_set(:UNDERLINE,
                                                 "\e[4m")
         end
-
-        ui = Gem.ui
 
         gems = options[:args].map do |s|
           parts = s.split(":", 3)
