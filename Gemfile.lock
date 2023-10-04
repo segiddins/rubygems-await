@@ -10,6 +10,7 @@ GEM
     ast (2.4.2)
     base64 (0.1.1)
     json (2.6.3)
+    json (2.6.3-java)
     language_server-protocol (3.17.0.3)
     parallel (1.23.0)
     parser (3.2.2.3)
@@ -17,6 +18,7 @@ GEM
       racc
     power_assert (2.0.3)
     racc (1.7.1)
+    racc (1.7.1-java)
     rainbow (3.1.1)
     rake (13.0.6)
     regexp_parser (2.8.1)
@@ -46,8 +48,9 @@ PLATFORMS
   arm64-darwin
   arm64-darwin-22
   arm64-linux
-  x64-linux
+  java
   x86-linux
+  x86_64-linux
 
 DEPENDENCIES
   rake (~> 13.0)
