@@ -10,6 +10,7 @@ module Gem
 
       def initialize
         require "rubygems/await"
+        require "bundler"
 
         awaiters = Rubygems::Await::Awaiter.subclasses.each_with_object({}) { |a, h| h[a.awaiter_name] = a }
         skip = ["dependency api"]
@@ -58,8 +59,6 @@ module Gem
       end
 
       def execute
-        require "bundler"
-
         unless defined?(Bundler::Thor::Shell::Color::UNDERLINE)
           Bundler::Thor::Shell::Color.const_set(:UNDERLINE,
                                                 "\e[4m")
