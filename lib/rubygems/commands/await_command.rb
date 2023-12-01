@@ -18,7 +18,7 @@ module Gem
 
         defaults = {
           timeout: 5 * 60,
-          awaiters:,
+          awaiters: awaiters,
           skip: ["dependency api"],
           only: nil
         }
@@ -148,7 +148,7 @@ module Gem
 
       private
 
-      def log(level: "info", tags: nil, &)
+      def log(level: "info", tags: nil)
         return unless Bundler.ui.level(level)
 
         s = Time.now.to_s << " "
