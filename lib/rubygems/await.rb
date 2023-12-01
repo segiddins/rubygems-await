@@ -7,6 +7,17 @@ module Rubygems
     class Error < StandardError; end
 
     class Awaiter
+      unless respond_to?(:subclasses)
+        def self.subclasses
+          @subclasses ||= []
+        end
+
+        def inherited(klass)
+          super(klass)
+          subclasses << klass
+        end
+      end
+
       attr_reader :gems, :source, :deadline, :name_indent, :source_uri
 
       def initialize(gems, source, deadline, name_indent = 10)
@@ -155,6 +166,14 @@ module Rubygems
       def expired?(padding = 0)
         Time.now + padding > deadline
       end
+
+      def safe_load_marshal(contents)
+        if Bundler.respond_to?(:safe_load_marshal)
+          Bundler.safe_load_marshal(contents)
+        else
+          Marshal.load(contents) # rubocop:disable Security/MarshalLoad
+        end
+      end
     end
 
     class VersionsAwaiter < Awaiter
@@ -231,7 +250,11 @@ module Rubygems
 
         downloader.fetch(uri)
         true
-      rescue Bundler::Fetcher::AuthenticationForbiddenError => e
+      rescue (if defined?(::Bundler::Fetcher::AuthenticationForbiddenError)
+                ::Bundler::Fetcher::AuthenticationForbiddenError
+              else
+                ::Bundler::Fetcher::AuthenticationRequiredError
+              end) => e
         log_error(e) { "#{Bundler::URICredentialsFilter.credential_filtered_uri(uri)} not found" }
         false
       end
@@ -276,7 +299,7 @@ module Rubygems
         fetcher = Bundler.rubygems.gem_remote_fetcher
         path = source_uri + "specs.#{Gem.marshal_version}.gz"
         contents = fetcher.fetch_path(path)
-        idx = Bundler.safe_load_marshal(contents)
+        idx = safe_load_marshal(contents)
 
         idx.each do |found|
           tuple = Gem::NameTuple.new(*found.map!(&:to_s))
@@ -298,7 +321,7 @@ module Rubygems
         fetcher = Bundler.rubygems.gem_remote_fetcher
         path = source_uri + "prerelease_specs.#{Gem.marshal_version}.gz"
         contents = fetcher.fetch_path(path)
-        idx = Bundler.safe_load_marshal(contents)
+        idx = safe_load_marshal(contents)
 
         idx.each do |found|
           tuple = Gem::NameTuple.new(*found.map!(&:to_s))
@@ -320,7 +343,7 @@ module Rubygems
         dependency_api_uri = "#{source_uri}api/v1/dependencies"
         dependency_api_uri.query = URI.encode_www_form(gems: missing.keys.sort)
         marshalled_deps = downloader.fetch(dependency_api_uri).body
-        deps = Bundler.safe_load_marshal(marshalled_deps)
+        deps = safe_load_marshal(marshalled_deps)
 
         deps.each do |s|
           name, number, platform = s.values_at(:name, :number, :platform)

@@ -115,7 +115,7 @@ module Gem
           all_missing.uniq!
           all_missing.map! { Bundler.ui.add_color(_1.respond_to?(:full_name) ? _1.full_name : _1.to_s, :red, :bold) }
           log(level: "error") do
-            Bundler.ui.add_color("Timed out", :red) << " after " <<
+            Bundler.ui.add_color(+"Timed out", :red) << " after " <<
               Bundler.ui.add_color("#{Time.now.-(start).round(2)}s", :white, :bold) <<
               ". Check that #{all_missing.join(", ")} are published."
           end
