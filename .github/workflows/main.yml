@@ -10,30 +10,49 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }} (RubyGems ${{ matrix.rubygems }}, Bundler ${{ matrix.bundler }})
+    name: Test on ${{ matrix.os.name }} (${{ matrix.ruby.name }})
     strategy:
+      fail-fast: false
       matrix:
-        ruby:
-          - "3.2.2"
-          - "jruby-9.4"
-          - "truffleruby-23"
-        rubygems:
-          - "3.4.20"
-        bundler:
-          - "2.4.20"
+        os:
+          - { name: Ubuntu, value: ubuntu-22.04 }
 
-    env:
-      BUNDLER_VERSION: ${{ matrix.bundler }}
+        ruby:
+          - { name: ruby-3.0, value: 3.0.6 }
+          - { name: ruby-3.1, value: 3.1.4 }
+          - { name: ruby-3.2, value: 3.2.2 }
+
+        include:
+          - os: { name: macOS, value: macos-12 }
+            ruby: { name: ruby-3.0, value: 3.0.6 }
+            timeout: 10
+          - os: { name: macOS, value: macos-12 }
+            ruby: { name: ruby-3.1, value: 3.1.4 }
+            timeout: 10
+          - os: { name: macOS, value: macos-12 }
+            ruby: { name: ruby-3.2, value: 3.2.2 }
+            timeout: 10
+          - os: { name: Windows, value: windows-2022 }
+            ruby: { name: ruby-3.0, value: 3.0.6 }
+            timeout: 20
+          - os: { name: Windows, value: windows-2022 }
+            ruby: { name: ruby-3.1, value: 3.1.4 }
+            timeout: 20
+          - os: { name: Windows, value: windows-2022 }
+            ruby: { name: ruby-3.2, value: 3.2.2 }
+            timeout: 20
+          - ruby: { name: truffleruby-23, value: truffleruby-23.1.1 }
+            timeout: 20
+          - ruby: { name: jruby-9.4, value: jruby-9.4 }
+            timeout: 20
 
     steps:
       - uses: actions/checkout@v4
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby }}
+          ruby-version: ${{ matrix.ruby.value }}
           bundler-cache: true
-      - name: Update rubygems
-        run: gem update --system=${{ matrix.rubygems }}
       - name: Run the default task
         run: bin/rake
 
@@ -43,4 +62,5 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
+      # will run /bin/true or /bin/false depending on the result of the build job
       - run: /bin/${{ (needs.build.result == 'success' || needs.build.result == 'skipped') }}

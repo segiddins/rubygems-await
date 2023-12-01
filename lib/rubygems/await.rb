@@ -125,7 +125,7 @@ module Rubygems
         raise NotImplementedError
       end
 
-      def log(level: "info", tags: nil, &)
+      def log(level: "info", tags: nil)
         return unless Bundler.ui.level(level)
 
         s = Time.now.to_s << " "
