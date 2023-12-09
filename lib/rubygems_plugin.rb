@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 
-require "rubygems/command"
+require "rubygems/command_manager"
 Gem::CommandManager.instance.register_command :await
