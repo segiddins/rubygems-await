@@ -68,7 +68,12 @@ module Gem
         end
 
         gems = options[:args].map do |s|
-          parts = s.split(":", 3)
+          if s.end_with?(".gem")
+            require "rubygems/package"
+            parts = Gem::Package.new(s).spec.name_tuple.to_a.compact.map(&:to_s)
+          else
+            parts = s.split(":", 3)
+          end
           raise Gem::CommandLineError, "Please specify a name:version[:platform], given #{s.inspect}" if parts.size < 2
 
           unless Gem::Version.correct?(parts[1])
