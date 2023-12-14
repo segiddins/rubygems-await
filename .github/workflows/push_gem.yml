@@ -34,4 +34,4 @@ jobs:
       - name: Release
         run: bundle exec rake release
       - name: Wait for release to propagate
-        run: gem exec rubygems-await -- pkg/*.gem
+        run: gem exec rubygems-await pkg/*.gem
