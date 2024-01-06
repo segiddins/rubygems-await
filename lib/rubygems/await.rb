@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "await/version"
+require "rubygems/remote_fetcher"
 
 module Rubygems
   module Await
@@ -54,7 +55,7 @@ module Rubygems
           log { "#{Bundler.ui.add_color("missing", :yellow)}: #{format_element(missing)}" }
           process_collection(missing)
         rescue StandardError => e
-          log_error(e)
+          log_error(e) { e.full_message(highlight: false) }
         ensure
           iteration += 1
           log(level: "debug") { "##{iteration} #{Time.now.-(start).round(2)}s" } if start
@@ -119,17 +120,38 @@ module Rubygems
       def compact_index_client
         remote = Bundler::Source::Rubygems::Remote.new URI(source)
         fetcher = Bundler::Fetcher.new(remote)
-        client = Bundler::Fetcher::CompactIndex.new(fetcher.send(:downloader), remote,
-                                                    fetcher.uri).send(:compact_index_client)
+        client =
+          if Bundler::VERSION < "2.5.0"
+            Bundler::Fetcher::CompactIndex.new(fetcher.send(:downloader), remote, fetcher.uri)
+          else
+            Bundler::Fetcher::CompactIndex.new(fetcher.send(:downloader), remote, fetcher.uri,
+                                               fetcher.gem_remote_fetcher)
+          end.send(:compact_index_client)
         # ensure that updating info always hits the network
         client.instance_variable_set(:@info_checksums_by_name, Hash.new { "" })
         client
       end
 
+      def gem_remote_fetcher
+        if Bundler.rubygems.respond_to?(:gem_remote_fetcher)
+          Bundler.rubygems.gem_remote_fetcher
+        else
+          remote = Bundler::Source::Rubygems::Remote.new URI(source)
+          fetcher = Bundler::Fetcher.new(remote)
+          raise "unsupported bundler version" unless fetcher.respond_to?(:gem_remote_fetcher)
+
+          fetcher.gem_remote_fetcher
+        end
+      end
+
       def index_fetcher
         remote = Bundler::Source::Rubygems::Remote.new URI(source)
         fetcher = Bundler::Fetcher.new(remote)
-        Bundler::Fetcher::Index.new(fetcher.send(:downloader), remote, fetcher.uri)
+        if Bundler::VERSION < "2.5.0"
+          Bundler::Fetcher::Index.new(fetcher.send(:downloader), remote, fetcher.uri)
+        else
+          Bundler::Fetcher::Index.new(fetcher.send(:downloader), remote, fetcher.uri, fetcher.gem_remote_fetcher)
+        end
       end
 
       def self.awaiter_name
@@ -275,9 +297,8 @@ module Rubygems
 
         remote_gem_path = source_uri + "gems/#{gem_file_name}"
 
-        fetcher = Bundler.rubygems.gem_remote_fetcher
         Bundler::SharedHelpers.filesystem_access(local_gem_path) do
-          fetcher.cache_update_path remote_gem_path, local_gem_path
+          gem_remote_fetcher.cache_update_path remote_gem_path, local_gem_path
         end
         true
       rescue Gem::RemoteFetcher::FetchError => e
@@ -296,9 +317,8 @@ module Rubygems
       end
 
       def process_collection(missing)
-        fetcher = Bundler.rubygems.gem_remote_fetcher
         path = source_uri + "specs.#{Gem.marshal_version}.gz"
-        contents = fetcher.fetch_path(path)
+        contents = gem_remote_fetcher.fetch_path(path)
         idx = safe_load_marshal(contents)
 
         idx.each do |found|
@@ -318,9 +338,8 @@ module Rubygems
       end
 
       def process_collection(missing)
-        fetcher = Bundler.rubygems.gem_remote_fetcher
         path = source_uri + "prerelease_specs.#{Gem.marshal_version}.gz"
-        contents = fetcher.fetch_path(path)
+        contents = gem_remote_fetcher.fetch_path(path)
         idx = safe_load_marshal(contents)
 
         idx.each do |found|
