@@ -99,5 +99,15 @@ module Rubygems
         assert_match "Found bundler-2.4.22", out
       end
     end
+
+    test "run with gems and --silent" do
+      VCR.use_cassette "2023-12-01" do
+        out, err = capture_output do
+          invoke "bundler:2.4.22", "--silent"
+        end
+        assert_empty err
+        assert_empty out
+      end
+    end
   end
 end
