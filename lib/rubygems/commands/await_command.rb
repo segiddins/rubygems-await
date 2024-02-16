@@ -66,6 +66,7 @@ module Gem
           Bundler::Thor::Shell::Color.const_set(:UNDERLINE,
                                                 "\e[4m")
         end
+        Bundler.ui.level = "silent" if options[:silent]
 
         gems = options[:args].map do |s|
           if s.end_with?(".gem")
