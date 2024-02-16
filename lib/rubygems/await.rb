@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "await/version"
+require "bundler/vendored_uri"
 require "rubygems/remote_fetcher"
 
 module Rubygems
