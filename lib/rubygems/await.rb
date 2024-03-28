@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
 require_relative "await/version"
+require "bundler/vendored_uri"
 require "rubygems/remote_fetcher"
+require "set"
 
 module Rubygems
   module Await
+    URI = defined?(Gem::URI) ? Gem::URI : Bundler::URI
+
     class Error < StandardError; end
 
     class Awaiter
@@ -24,7 +28,7 @@ module Rubygems
       def initialize(gems, source, deadline, name_indent = 10)
         @gems = gems
         @source = source
-        @source_uri = Bundler::URI.parse(source)
+        @source_uri = URI.parse(source)
         @deadline = deadline
         @name_indent = name_indent
       end
@@ -112,13 +116,13 @@ module Rubygems
       end
 
       def downloader
-        remote = Bundler::Source::Rubygems::Remote.new URI(source)
+        remote = Bundler::Source::Rubygems::Remote.new URI.parse(source)
         fetcher = Bundler::Fetcher.new(remote)
         fetcher.send(:downloader)
       end
 
       def compact_index_client
-        remote = Bundler::Source::Rubygems::Remote.new URI(source)
+        remote = Bundler::Source::Rubygems::Remote.new URI.parse(source)
         fetcher = Bundler::Fetcher.new(remote)
         client =
           if Bundler::VERSION < "2.5.0"
@@ -136,7 +140,7 @@ module Rubygems
         if Bundler.rubygems.respond_to?(:gem_remote_fetcher)
           Bundler.rubygems.gem_remote_fetcher
         else
-          remote = Bundler::Source::Rubygems::Remote.new URI(source)
+          remote = Bundler::Source::Rubygems::Remote.new URI.parse(source)
           fetcher = Bundler::Fetcher.new(remote)
           raise "unsupported bundler version" unless fetcher.respond_to?(:gem_remote_fetcher)
 
@@ -145,7 +149,7 @@ module Rubygems
       end
 
       def index_fetcher
-        remote = Bundler::Source::Rubygems::Remote.new URI(source)
+        remote = Bundler::Source::Rubygems::Remote.new URI.parse(source)
         fetcher = Bundler::Fetcher.new(remote)
         if Bundler::VERSION < "2.5.0"
           Bundler::Fetcher::Index.new(fetcher.send(:downloader), remote, fetcher.uri)
