@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rubygems-await (0.5.0)
+    rubygems-await (0.5.1)
       bundler (>= 2.2)
 
 GEM
@@ -74,3 +74,4 @@ DEPENDENCIES
   test-unit (~> 3.0)
   vcr (~> 6.2)
   webmock (~> 3.19)
+
