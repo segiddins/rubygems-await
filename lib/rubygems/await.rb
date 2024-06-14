@@ -253,7 +253,15 @@ module Rubygems
 
       def process_element(name, tuples)
         cic = compact_index_client
-        cic.send :update_info, name
+        if cic.respond_to?(:update_info, true)
+          cic.send :update_info, name
+        elsif cic.respond_to?(:info)
+          cic.info name
+        else
+          raise NotImplementedError,
+                "unsupported bundler version: #{Bundler::VERSION}. " \
+                "#{cic.class} does not respond to #info or #update_info"
+        end
         info = cic.instance_variable_get(:@cache).dependencies(name)
 
         info.each do |version, platform|
