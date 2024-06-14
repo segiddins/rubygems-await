@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rubygems-await (0.5.1)
+    rubygems-await (0.5.2)
       bundler (>= 2.2)
 
 GEM
