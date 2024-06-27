@@ -262,7 +262,11 @@ module Rubygems
                 "unsupported bundler version: #{Bundler::VERSION}. " \
                 "#{cic.class} does not respond to #info or #update_info"
         end
-        info = cic.instance_variable_get(:@cache).dependencies(name)
+        info = if defined?(::Bundler::CompactIndexClient::Parser)
+                 cic.info(name)
+               else
+                 cic.instance_variable_get(:@cache).dependencies(name)
+               end
 
         info.each do |version, platform|
           tuple = Gem::NameTuple.new(name, version, platform)
