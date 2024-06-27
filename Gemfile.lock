@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rubygems-await (0.5.2)
+    rubygems-await (0.5.3)
       bundler (>= 2.2)
 
 GEM
@@ -75,3 +75,5 @@ DEPENDENCIES
   vcr (~> 6.2)
   webmock (~> 3.19)
 
+BUNDLED WITH
+   2.5.12
