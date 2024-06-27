@@ -24,7 +24,7 @@ jobs:
           - { name: ruby-3.0, value: 3.0.6 }
           - { name: ruby-3.1, value: 3.1.4 }
           - { name: ruby-3.2, value: 3.2.2 }
-          - { name: ruby-3.3, value: 3.3.0 }
+          - { name: ruby-3.3, value: 3.3.3 }
 
         include:
           - os: { name: macOS, value: macos-12 }
@@ -37,7 +37,7 @@ jobs:
             ruby: { name: ruby-3.2, value: 3.2.2 }
             timeout: 10
           - os: { name: macOS, value: macos-12 }
-            ruby: { name: ruby-3.3, value: 3.3.0 }
+            ruby: { name: ruby-3.3, value: 3.3.3 }
             timeout: 10
           - os: { name: Windows, value: windows-2022 }
             ruby: { name: ruby-3.0, value: 3.0.6 }
