@@ -50,6 +50,8 @@ jobs:
             timeout: 20
           - ruby: { name: truffleruby-23, value: truffleruby-23.1.1 }
             timeout: 20
+          - ruby: { name: ruby-head, value: ruby-head }
+            timeout: 20
           # - ruby: { name: jruby-9.4, value: jruby-9.4 }
           #   timeout: 20
 
