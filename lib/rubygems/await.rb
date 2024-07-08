@@ -132,7 +132,11 @@ module Rubygems
                                                fetcher.gem_remote_fetcher)
           end.send(:compact_index_client)
         # ensure that updating info always hits the network
-        client.instance_variable_set(:@info_checksums_by_name, Hash.new { "" })
+        if client.instance_variable_defined?(:@parser)
+          client.instance_variable_get(:@parser).instance_variable_set(:@info_checksums, Hash.new { "" })
+        else
+          client.instance_variable_set(:@info_checksums_by_name, Hash.new { "" })
+        end
         client
       end
 
@@ -268,7 +272,9 @@ module Rubygems
                  cic.instance_variable_get(:@cache).dependencies(name)
                end
 
-        info.each do |version, platform|
+        info.each do |args|
+          args.shift if args.first == name
+          version, platform, = *args
           tuple = Gem::NameTuple.new(name, version, platform)
           log_found(tuple) if tuples.delete?(tuple)
         end
