@@ -80,6 +80,3 @@ DEPENDENCIES
   test-unit (~> 3.0)
   vcr (~> 6.2)
   webmock (~> 3.19)
-
-BUNDLED WITH
-   2.5.14
