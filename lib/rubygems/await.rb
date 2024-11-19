@@ -18,7 +18,7 @@ module Rubygems
         end
 
         def inherited(klass)
-          super(klass)
+          super
           subclasses << klass
         end
       end

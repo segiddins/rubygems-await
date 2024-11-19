@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary = "A RubyGems plugin with a command to wait until gems are available."
   spec.homepage = "https://github.com/segiddins/rubygems-await"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.0"
+  spec.required_ruby_version = ">= 3.1"
   spec.required_rubygems_version = ">= 3.2"
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org/"
