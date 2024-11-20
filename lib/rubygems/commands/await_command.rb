@@ -22,8 +22,7 @@ module Gem
           only: nil
         }
 
-        super "await", "Await pushed gems being available",
-          defaults
+        super("await", "Await pushed gems being available", defaults)
 
         accept_uri_http
 
