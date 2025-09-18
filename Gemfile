@@ -6,7 +6,7 @@ source "https://rubygems.org"
 gemspec
 
 gem "parallel_tests", "~> 4.3"
-gem "rake", "~> 13.0"
+gem "rake", "~> 13.3"
 gem "rubocop", "~> 1.21"
 gem "rubocop-rake", "~> 0.6.0"
 gem "test-unit", "~> 3.0"
