@@ -266,7 +266,7 @@ module Rubygems
                 "unsupported bundler version: #{Bundler::VERSION}. " \
                 "#{cic.class} does not respond to #info or #update_info"
         end
-        info = if defined?(::Bundler::CompactIndexClient::Parser)
+        info = if cic.instance_variable_defined?(:@parser)
                  cic.info(name)
                else
                  cic.instance_variable_get(:@cache).dependencies(name)
